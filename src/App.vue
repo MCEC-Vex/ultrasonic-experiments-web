@@ -1,60 +1,78 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
+    <v-app>
+        <template v-if="$store.state.loggedIn">
+            <v-navigation-drawer
+                    v-model="drawer"
+                    :clipped="$vuetify.breakpoint.lgAndUp"
+                    app
+            >
+                <v-list nav>
+                    <v-list-item link :to="{name: 'overview'}" exact>
+                        <v-list-item-icon>
+                            <v-icon>mdi-view-dashboard</v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>Overview</v-list-item-title>
+                        </v-list-item-content>
+                    </v-list-item>
+                </v-list>
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
+                <template v-slot:append>
+                    <v-row justify="center" class="pb-4">
+                        <dark-switch/>
+                    </v-row>
+                </template>
+            </v-navigation-drawer>
 
-      <v-spacer></v-spacer>
+            <v-app-bar
+                    app
+                    :clipped-left="$vuetify.breakpoint.lgAndUp"
+                    color="primary"
+            >
+                <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
+                <div class="d-flex align-center">
+                    <v-toolbar-title>
+                        Ultrasonic Experiments
+                    </v-toolbar-title>
+                </div>
+            </v-app-bar>
 
-    <v-content>
-      <HelloWorld/>
-    </v-content>
-  </v-app>
+            <v-content>
+                <!-- Loading dialog for when connection is lost -->
+                <v-dialog
+                        v-model="$store.state.connectionLost"
+                        hide-overlay
+                        persistent
+                        width="300"
+                >
+                    <v-card color="primary" dark>
+                        <v-card-text>
+                            Connection lost, trying to reconnect...
+                            <v-progress-linear indeterminate color="white" class="mb-0"/>
+                        </v-card-text>
+                    </v-card>
+                </v-dialog>
+
+                <router-view/>
+            </v-content>
+        </template>
+        <!-- Show the connection box if not yet connected -->
+        <template v-else>
+            <Connect/>
+        </template>
+    </v-app>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+    import Connect from './views/Connect';
+    import DarkSwitch from './components/DarkSwitch';
 
-export default {
-  name: 'App',
-
-  components: {
-    HelloWorld,
-  },
-
-  data: () => ({
-    //
-  }),
-};
+    export default {
+        name: 'App',
+        components: {Connect, DarkSwitch},
+        data: () => ({
+            drawer: null
+        })
+    };
 </script>
