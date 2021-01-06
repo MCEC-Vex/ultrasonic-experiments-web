@@ -1,29 +1,32 @@
 <template>
-    <v-switch v-model="$vuetify.theme.dark" :append-icon="icon" hide-details label="Dark Mode" class="darkswitch"/>
+    <v-switch color="accent" v-model="$vuetify.theme.dark" :append-icon="icon" hide-details label="Dark Mode"/>
 </template>
 
 <script>
-    export default {
-        name: 'DarkSwitch',
-        computed: {
-            icon()
-            {
-                return 'mdi-' + (this.$vuetify.theme.dark ? 'weather-night' : 'white-balance-sunny');
-            }
-        },
-        watch: {
-            '$vuetify.theme.dark': function(dark)
-            {
-                //TODO save dark mode
-            }
+import localforage from 'localforage';
+export default {
+    name: 'DarkSwitch',
+    computed: {
+        icon()
+        {
+            return 'mdi-' + (this.$vuetify.theme.dark ? 'weather-night' : 'white-balance-sunny');
         }
-    };
+    },
+    watch: {
+        '$vuetify.theme.dark': function(dark)
+        {
+            localforage.setItem('theme', dark ? 'dark' : 'light');
+        }
+    },
+    mounted()
+    {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =>
+        {
+            this.$vuetify.theme.dark = e.matches;
+        });
+    }
+};
 </script>
 
 <style scoped>
-    .darkswitch
-    {
-        /*margin-top: 0;
-        padding-top: 0;*/
-    }
 </style>

@@ -3,7 +3,8 @@ import App from './App.vue';
 import './registerServiceWorker';
 import router from './router';
 import store from './store';
-import vuetify from './plugins/vuetify';
+import Vuetify from 'vuetify/lib';
+import localforage from 'localforage';
 import VueNativeSock from 'vue-native-websocket';
 
 Vue.config.productionTip = false;
@@ -12,13 +13,27 @@ Vue.use(VueNativeSock, 'ws://localhost:8090', {
     connectManually: true,
     store
 });
+Vue.use(Vuetify);
 
-new Vue({
-    router,
-    store,
-    vuetify,
-    render: function(h)
+(async() =>
+{
+    let theme = await localforage.getItem('theme');
+    if(!theme)
     {
-        return h(App);
+        theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
     }
-}).$mount('#app');
+    
+    new Vue({
+        router,
+        vuetify: new Vuetify({
+            theme: {
+                dark: theme !== 'light'
+            }
+        }),
+        store,
+        render: function(h)
+        {
+            return h(App);
+        }
+    }).$mount('#app');
+})();
