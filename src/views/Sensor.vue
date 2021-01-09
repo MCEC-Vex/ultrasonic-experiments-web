@@ -1,6 +1,6 @@
 <template>
     <v-container fluid>
-        <v-row align="center">
+        <v-row align="center" class="mb-4">
             <v-col md="4">
                 <v-row align="center">
                     <v-col cols="6">
@@ -24,7 +24,7 @@
                 </v-row>
             </v-col>
             <v-col>
-                <v-sparkline :value="reversedReadings" type="bar" auto-line-width/>
+                <v-sparkline :value="paddedReadingHistory" type="bar" auto-line-width/>
             </v-col>
         </v-row>
     </v-container>
@@ -40,7 +40,8 @@ export default {
     name: 'Sensor',
     data: () => ({
         pollingInterval: null,
-        shownReadings: 25
+        shownReadings: 25,
+        readingHistory: []
     }),
     computed: {
         sensorIndex()
@@ -58,10 +59,9 @@ export default {
                 return null;
             }
         },
-        reversedReadings()
+        paddedReadingHistory()
         {
-            const arr = (this.sensor === null) ? [] : this.sensor.readings.slice(0, this.shownReadings);
-            return padArray(arr, this.shownReadings, 0).reverse();
+            return padArray(this.readingHistory.slice(-25).map(element => element.reading), 25, 0);
         }
     },
     methods: {
@@ -83,13 +83,21 @@ export default {
         },
         clearReadings()
         {
-            this.sensor.readings = [];
+            this.readingHistory = [];
         }
     },
     watch: {
         sensor()
         {
             this.setPollingIntervalDefault();
+        },
+        'sensor.latestReading': function(newReading, oldReading)
+        {
+            this.readingHistory.push(newReading);
+            if(this.readingHistory.length > 100)
+            {
+                this.readingHistory.shift();
+            }
         }
     },
     mounted()

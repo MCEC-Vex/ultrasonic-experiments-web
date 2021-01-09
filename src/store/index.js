@@ -40,12 +40,17 @@ export default new Vuex.Store({
                             enabled: false,
                             interval: 0,
                             timingOffset: 0,
-                            readings: []
+                            readings: [],
+                            latestReading: {reading: 0, time: Date.now()}
                         };
                     });
                 }
                 else if(message.type === 'reading')
                 {
+                    state.sensors[message.sensor].latestReading = {
+                        reading: message.data,
+                        time: Date.now()
+                    };
                     state.sensors[message.sensor].readings.unshift(message.data);
                     if(state.sensors[message.sensor].readings.length > 100)
                     {
