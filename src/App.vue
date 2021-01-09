@@ -38,7 +38,7 @@
                 </div>
             </v-app-bar>
 
-            <v-content>
+            <v-main>
                 <!-- Loading dialog for when connection is lost -->
                 <v-dialog
                         v-model="$store.state.connectionLost"
@@ -55,7 +55,7 @@
                 </v-dialog>
 
                 <router-view/>
-            </v-content>
+            </v-main>
         </template>
         <!-- Show the connection box if not yet connected -->
         <template v-else>
