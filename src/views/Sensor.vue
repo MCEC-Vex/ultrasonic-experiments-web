@@ -27,10 +27,25 @@
                 <v-sparkline :value="paddedReadingHistory" type="bar" auto-line-width/>
             </v-col>
         </v-row>
+        <v-row>
+            <v-col>
+                <v-card>
+                    <v-card-title>Analysis</v-card-title>
+                    <v-card-text>
+                        <v-data-table :headers="analysisHeaders"
+                                      :items="statsData"
+                                      hide-default-footer
+                        />
+                    </v-card-text>
+                </v-card>
+            </v-col>
+        </v-row>
     </v-container>
 </template>
 
 <script>
+import BaseStats from '@/stats/BaseStats';
+
 function padArray(array, length, fill)
 {
     return length > array.length ? array.concat(Array(length - array.length).fill(fill)) : array;
@@ -41,7 +56,22 @@ export default {
     data: () => ({
         pollingInterval: null,
         shownReadings: 25,
-        readingHistory: []
+        readingHistory: [],
+        stats: [new BaseStats()],
+        statsData: [],
+        analysisHeaders: [
+            {
+                text: 'Name',
+                align: 'start',
+                value: 'name'
+            },
+            {text: 'Latest (cm)', value: 'latest'},
+            {text: 'Mean (cm)', value: 'mean'},
+            {text: 'Median (cm)', value: 'median'},
+            {text: 'Min (cm)', value: 'min'},
+            {text: 'Max (cm)', value: 'max'},
+            {text: 'Stddev', value: 'stddev'}
+        ]
     }),
     computed: {
         sensorIndex()
@@ -93,11 +123,22 @@ export default {
         },
         'sensor.latestReading': function(newReading, oldReading)
         {
+            if(newReading === null)
+            {
+                return;
+            }
+
             this.readingHistory.push(newReading);
             if(this.readingHistory.length > 100)
             {
                 this.readingHistory.shift();
             }
+
+            for(const statConsumer of this.stats)
+            {
+                statConsumer.pushItem(newReading.reading);
+            }
+            this.statsData = this.stats.map(statConsumer => statConsumer.compute());
         }
     },
     mounted()

@@ -41,7 +41,7 @@ export default new Vuex.Store({
                             interval: 0,
                             timingOffset: 0,
                             readings: [],
-                            latestReading: {reading: 0, time: Date.now()}
+                            latestReading: null
                         };
                     });
                 }
