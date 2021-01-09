@@ -24,7 +24,7 @@
                 </v-row>
             </v-col>
             <v-col>
-                <v-sparkline :value="reversedReadings" type="bars" auto-line-width/>
+                <v-sparkline :value="reversedReadings" type="bar" auto-line-width/>
             </v-col>
         </v-row>
     </v-container>
@@ -76,7 +76,6 @@ export default {
         },
         setPollingIntervalDefault()
         {
-            console.log('Sensor is null? ' + (this.sensor === null));
             if(this.sensor !== null && this.pollingInterval === null)
             {
                 this.pollingInterval = this.sensor.interval;
